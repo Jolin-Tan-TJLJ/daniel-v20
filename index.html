@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daniel v20: Patch Notes</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================
+      THEME (edit colors here)
+    ========================= */
+    :root{
+      --bg:#0B1020;
+      --panel:#111A33;
+      --border:#2B3A70;
+      --text:#E7ECFF;
+      --muted:#A9B5E8;
+      --accent:#7EE6C5;
+      --accent2:#F3C98B;
+      --dangerLow:#FF8AA3;
+      --shadow: 0 14px 40px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 700px at 30% 10%, rgba(126,230,197,.10), transparent 60%),
+                  radial-gradient(900px 600px at 70% 30%, rgba(243,201,139,.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      font-family: "VT323", monospace;
+      letter-spacing: .2px;
+    }
+
+    /* Layout container */
+    .wrap{
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    /* Cards */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 45%),
+                  var(--panel);
+      border: 1px solid rgba(43,58,112,.75);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    /* =========================
+      “PAGES” (sections)
+      - We simulate 6 pages by showing/hiding sections
+    ========================= */
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    /* Header text */
+    .title{
+      font-family: "Press Start 2P", system-ui;
+      font-size: clamp(16px, 2.2vw, 20px);
+      line-height: 1.35;
+      margin: 0 0 10px;
+    }
+    .subtitle{
+      color: var(--muted);
+      margin: 0 0 10px;
+      font-size: 22px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .note{
+      color: var(--muted);
+      margin: 10px 0 0;
+      font-size: 20px;
+    }
+
+    /* Buttons */
+    .btn{
+      cursor:pointer;
+      border: 1px solid rgba(126,230,197,.65);
+      background: rgba(126,230,197,.10);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-family:"Press Start 2P";
+      font-size: 12px;
+      line-height: 1.4;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(126,230,197,.16); border-color: rgba(126,230,197,.95); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btn-secondary{
+      border-color: rgba(243,201,139,.6);
+      background: rgba(243,201,139,.10);
+    }
+    .btn-secondary:hover{
+      background: rgba(243,201,139,.16);
+      border-color: rgba(243,201,139,.95);
+    }
+
+    /* Simple input */
+    .input{
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(43,58,112,.85);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      font-size: 22px;
+      font-family: "VT323", monospace;
+      outline: none;
+    }
+    .input:focus{
+      border-color: rgba(126,230,197,.85);
+      box-shadow: 0 0 0 3px rgba(126,230,197,.12);
+    }
+
+    /* Tiny typing caret */
+    .caret{
+      display:inline-block;
+      width: 10px;
+      margin-left: 6px;
+      color: var(--accent);
+      animation: blink 1s steps(2, jump-none) infinite;
+    }
+    @keyframes blink{ 50%{ opacity:0; } }
+
+    /* Start “Press Start” animation */
+    @keyframes startBlink { 0%,100%{opacity:1} 50%{opacity:.45} }
+    @keyframes startBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+    .start-anim{
+      animation: startBlink 1.2s steps(2) infinite, startBob 1.2s ease-in-out infinite;
+    }
+    .start-anim::before{
+      content: "▶";
+      color: var(--accent2);
+      display: inline-block;
+      margin-right: 8px;
+      transform: translateY(1px);
+    }
+
+    /* Grid layout (main page) */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 16px;
+    }
+    @media (max-width: 780px){
+      .grid{ grid-template-columns: 1fr; }
+      .subtitle{ font-size: 20px; }
+    }
+
+    /* Section headers */
+    .section-h{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .section-title{
+      font-family:"Press Start 2P";
+      font-size: 12px;
+      margin: 0;
+      color: var(--accent2);
+    }
+    .tag{
+      font-size: 18px;
+      color: var(--muted);
+      border: 1px solid rgba(43,58,112,.9);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.15);
+      white-space: nowrap;
+    }
+
+    /* Portrait */
+    .portrait-wrap{ margin: 14px 0 10px; max-width: 160px; }
+    .portrait-btn{
+      border: 1px solid rgba(43,58,112,.85);
+      background: rgba(0,0,0,.10);
+      border-radius: 16px;
+      padding: 10px;
+      cursor: pointer;
+      max-width: 160px;
+    }
+    .portrait-btn img{
+      width: 140px; height: 140px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+    }
+
+    /* Portrait hint: pulsing + underline */
+    @keyframes hintPulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+    .portrait-hint{
+      color: var(--muted);
+      margin: 8px 0 0;
+      font-size: 16px;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      animation: hintPulse 1.6s ease-in-out infinite;
+    }
+    .portrait-wrap:hover .portrait-hint{ color: var(--accent2); }
+
+    /* Character kv + stats */
+    .kv{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px 14px;
+      font-size: 22px;
+      margin-top: 8px;
+    }
+    .k{ color: var(--muted); }
+    .v{ color: var(--text); }
+
+    .stats{
+      margin-top: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .stat-row{
+      display:grid;
+      grid-template-columns: 140px 1fr 44px;
+      gap: 10px;
+      align-items:center;
+      font-size: 22px;
+    }
+    @media (max-width: 520px){
+      .stat-row{ grid-template-columns: 120px 1fr 40px; }
+      .kv{ grid-template-columns: 110px 1fr; }
+    }
+    .bar{
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(231,236,255,.10);
+      border: 1px solid rgba(43,58,112,.75);
+      overflow:hidden;
+      position:relative;
+    }
+    .fill{
+      height:100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(126,230,197,.95), rgba(243,201,139,.85));
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform .65s ease;
+    }
+    /* Animate bars when main page becomes active */
+    .page-main.active .fill{ transform: scaleX(1); }
+    .pct{ color: var(--muted); text-align:right; }
+
+    /* Patch notes */
+    .log{
+      margin: 10px 0 0;
+      padding: 0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      font-size: 22px;
+    }
+    .log li{
+      border: 1px solid rgba(43,58,112,.7);
+      border-radius: 14px;
+      padding: 12px 12px;
+      background: rgba(0,0,0,.12);
+    }
+    .ver{
+      font-family:"Press Start 2P";
+      font-size: 11px;
+      color: var(--accent);
+      margin-right: 10px;
+    }
+    .muted{ color: var(--muted); }
+
+    /* Reusable reveal panel */
+    .reveal{
+      margin-top: 12px;
+      border: 1px dashed rgba(43,58,112,.85);
+      border-radius: 14px;
+      padding: 14px 14px;
+      background: rgba(0,0,0,.12);
+      overflow:hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height .55s ease, opacity .45s ease;
+    }
+    .reveal.open{ max-height: 650px; opacity: 1; }
+    .msg{ margin: 0; font-size: 22px; color: var(--text); }
+
+    /* Easter egg heart button */
+    .heart-btn{
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      color: var(--muted);
+      font-family: "VT323", monospace;
+      font-size: 20px;
+      opacity: .85;
+    }
+    .heart-btn:hover{ opacity: 1; color: var(--accent2); }
+
+    /* Pixel heart itself */
+    .pixel-heart{
+      display:inline-block;
+      width: 14px;
+      height: 14px;
+      background: transparent;
+      position: relative;
+      top: 1px;
+      opacity: 0;            /* hidden until hover */
+      transform: translateY(2px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .subtitle:hover .pixel-heart,
+    .subtitle:focus-within .pixel-heart{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .pixel-heart::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      width: 2px;
+      height: 2px;
+      background: var(--dangerLow);
+      box-shadow:
+        2px 0 var(--dangerLow), 6px 0 var(--dangerLow), 8px 0 var(--dangerLow),
+        0px 2px var(--dangerLow), 2px 2px var(--dangerLow), 4px 2px var(--dangerLow), 6px 2px var(--dangerLow), 8px 2px var(--dangerLow), 10px 2px var(--dangerLow),
+        2px 4px var(--dangerLow), 4px 4px var(--dangerLow), 6px 4px var(--dangerLow), 8px 4px var(--dangerLow),
+        4px 6px var(--dangerLow), 6px 6px var(--dangerLow),
+        5px 8px var(--dangerLow);
+    }
+
+    /* “Toast” feedback */
+    .toast{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 20px;
+      min-height: 22px;
+    }
+    .toast.bad{ color: var(--dangerLow); }
+    .toast.good{ color: var(--accent); }
+
+    /* Modal overlay (video popup) */
+    .modal{
+      position: fixed;
+      inset: 0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      background: rgba(3,6,14,.72);
+      backdrop-filter: blur(6px);
+      z-index: 99;
+    }
+    .modal.open{ display:flex; }
+    .modal-inner{
+      width: min(760px, 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(43,58,112,.8);
+      background: linear-gradient(180deg, rgba(126,230,197,.08), rgba(17,26,51,.98));
+      box-shadow: var(--shadow);
+      padding: 18px;
+      position: relative;
+    }
+    .modal-h{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .modal-title{
+      font-family:"Press Start 2P";
+      font-size: 12px;
+      margin: 0;
+      color: var(--accent2);
+      line-height: 1.5;
+    }
+    .modal-close{
+      border: 1px solid rgba(243,201,139,.6);
+      background: rgba(243,201,139,.10);
+      border-radius: 12px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-family:"Press Start 2P";
+      font-size: 10px;
+      cursor:pointer;
+    }
+    .modal-close:hover{ border-color: rgba(243,201,139,.95); background: rgba(243,201,139,.16); }
+
+    /* Video */
+    .video{
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(43,58,112,.75);
+      background: rgba(0,0,0,.2);
+    }
+
+    footer{
+      margin-top: 16px;
+      text-align:center;
+      color: rgba(169,181,232,.85);
+      font-size: 18px;
+    }
+
+    /* Small helper row */
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- =========================================================
+      PAGE 1: WELCOME / START
+      ========================================================= -->
+    <section class="page active card" data-page="welcome">
+      <p class="title">DANIEL v20.0 — SYSTEM UPDATE</p>
+      <p class="note" style="margin-top:0;">
+        Initializing patch notes… preparing the Level 20 build<span class="caret">▌</span>
+      </p>
+
+      <div class="row" style="margin-top:14px;">
+        <!-- EDIT HERE: Start button text -->
+        <button class="btn start-anim" id="btnStart">PRESS START</button>
+      </div>
+
+      <p class="note" style="margin-top:14px;">
+        (Contains top secret changelog. Proceed at your own risk)
+      </p>
+    </section>
+
+    <!-- =========================================================
+      PAGE 2: QUIZ / PASSWORD GATE
+      ========================================================= -->
+    <section class="page card" data-page="gate" style="margin-top:16px;">
+      <p class="title">SECURITY CHECK</p>
+      <p class="note" style="margin-top:0;">
+        Answer correctly to continue. (You know this.) 😌
+      </p>
+
+      <!-- EDIT HERE: Question -->
+      <div style="margin-top:14px;">
+        <p class="note" style="margin:0 0 8px;">
+          Q: What is Jolin’s full name?
+        </p>
+
+        <!-- Option A: Multiple choice -->
+        <div class="row" style="margin-top:10px;">
+          <button class="btn btn-secondary gate-choice" data-correct="false">Jolin Tan</button>
+          <button class="btn btn-secondary gate-choice" data-correct="true">Tan Jia Ling Jolin</button>
+          <button class="btn btn-secondary gate-choice" data-correct="false">Jolin Tan Jia Ling</button>
+        </div>
+
+        <div id="gateToast" class="toast"></div>
+
+        <div class="row" style="margin-top:10px;">
+          <button class="btn" id="btnGateBack">BACK</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      PAGE 3: MAIN PROFILE / PATCH NOTES
+      ========================================================= -->
+    <section class="page card page-main" data-page="main" style="margin-top:16px;">
+      <header class="card" style="margin-bottom: 16px;">
+        <h1 class="title">Daniel v20: Patch Notes</h1>
+
+        <!-- EDIT HERE: Subtitle text -->
+        <div class="subtitle">
+          <span>A little “update screen” for your 20th Birthday:)</span>
+
+          <!-- Easter egg heart: appears on hover, clickable -->
+          <button class="heart-btn" id="btnHeart" type="button" aria-label="Easter egg">
+            <span class="pixel-heart" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <!-- EDIT HERE: small line below subtitle -->
+        <p class="note" style="margin-top:0;">
+          Not everything needs to be loud to be real.
+        </p>
+      </header>
+
+      <div class="grid">
+        <!-- LEFT: CHARACTER STATS -->
+        <section class="card">
+          <div class="section-h">
+            <h2 class="section-title">CHARACTER STATS</h2>
+            <span class="tag">Level 20</span>
+          </div>
+
+          <!-- Portrait toggle -->
+          <div class="portrait-wrap">
+            <button class="portrait-btn" id="btnPortrait" aria-label="Toggle portrait">
+              <img id="imgPortrait" src="daniel-nice.jpg" alt="Daniel portrait" />
+            </button>
+            <p class="portrait-hint">Click portrait to switch Persona</p>
+          </div>
+
+          <!-- EDIT HERE: basic profile -->
+          <div class="kv">
+            <div class="k">Name</div><div class="v">Myo Thet Tun, Daniel</div>
+            <div class="k">Class</div><div class="v">Resilient Builder</div>
+            <div class="k">Location</div><div class="v">Singapore</div>
+          </div>
+
+          <!-- EDIT HERE: bars (change widths + numbers) -->
+          <div class="stats">
+            <div class="stat-row">
+              <div class="k">Discipline</div>
+              <div class="bar"><div class="fill" style="width:86%;"></div></div>
+              <div class="pct">86</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="k">Courage</div>
+              <div class="bar"><div class="fill" style="width:78%;"></div></div>
+              <div class="pct">78</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="k">Growth</div>
+              <div class="bar"><div class="fill" style="width:90%;"></div></div>
+              <div class="pct">90</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="k" style="color:var(--dangerLow);">Self-Doubt</div>
+              <div class="bar"><div class="fill" style="width:67%;"></div></div>
+              <div class="pct">67</div>
+            </div>
+          </div>
+
+          <!-- EDIT HERE: gentle line -->
+          <p class="note">
+            Self-doubt shows up sometimes. It’s not a bug — it’s just a signal you care.
+          </p>
+        </section>
+
+        <!-- RIGHT: PATCH NOTES + UNLOCKABLES -->
+        <section class="card">
+          <div class="section-h">
+            <h2 class="section-title">PATCH NOTES</h2>
+            <span class="tag">v20.0</span>
+          </div>
+
+          <!-- EDIT HERE: patch notes -->
+          <ul class="log">
+            <li><span class="ver">v18.0</span> Entered Singapore alone. <span class="muted">New environment unlocked.</span></li>
+            <li><span class="ver">v19.0</span> Adapted + grew stronger. <span class="muted">Stability improved.</span></li>
+            <li><span class="ver">v20.0</span> Building something meaningful. <span class="muted">Long-term mode enabled.</span></li>
+          </ul>
+
+          <div style="height: 14px;"></div>
+
+          <div class="section-h">
+            <h2 class="section-title">UNLOCKABLE</h2>
+            <span class="tag">OPTIONAL</span>
+          </div>
+
+          <!-- =========================================================
+            UNLOCKABLE TEMPLATE (copy/paste as many as you want)
+            - Button must have:
+              class="toggle-btn"
+              data-target="#idOfReveal"
+              data-open-text="..."
+              data-close-text="..."
+            - Reveal must have a matching id, class="reveal"
+          ========================================================= -->
+
+          <!-- Unlockable 1 -->
+          <button
+            class="btn btn-secondary toggle-btn"
+            data-target="#unlock1"
+            data-open-text="OPEN WHEN YOU MISS HOME"
+            data-close-text="CLOSE MESSAGE"
+          >OPEN WHEN YOU MISS HOME</button>
+
+          <div class="reveal" id="unlock1" aria-hidden="true">
+            <!-- EDIT HERE: message -->
+            <p class="msg">
+              If today feels heavy, you don’t have to carry it perfectly.<br><br>
+              You’ve already proven you can adapt — and you don’t need to earn rest.<br>
+              So… take a slow breath. Eat something warm. Text someone you trust.<br><br>
+              You’re not “behind.” You’re building. And you’re doing it well.
+            </p>
+          </div>
+
+          <!-- Unlockable 2 -->
+          <button
+            class="btn btn-secondary toggle-btn"
+            data-target="#unlock2"
+            data-open-text="OPEN WHEN YOU DOUBT YOURSELF"
+            data-close-text="CLOSE MESSAGE"
+          >OPEN WHEN YOU DOUBT YOURSELF</button>
+
+          <div class="reveal" id="unlock2" aria-hidden="true">
+            <!-- EDIT HERE: message -->
+            <p class="msg">
+              Doubt doesn’t mean you’re weak — it means you’re trying something that matters.<br><br>
+              Don’t rush the proof. Keep the promise. One small step counts.
+            </p>
+          </div>
+
+          <!-- Unlockable 3 -->
+          <button
+            class="btn btn-secondary toggle-btn"
+            data-target="#unlock3"
+            data-open-text="OPEN WHEN YOU FEEL PROUD OF YOURSELF"
+            data-close-text="CLOSE MESSAGE"
+          >OPEN WHEN YOU FEEL PROUD OF YOURSELF</button>
+
+          <div class="reveal" id="unlock3" aria-hidden="true">
+            <!-- EDIT HERE: message -->
+            <p class="msg">
+              Pause here.<br><br>
+              You did that. Not by luck — by effort, discipline, and showing up again.
+            </p>
+          </div>
+
+          <div style="height: 14px;"></div>
+
+          <!-- Easter egg mini message -->
+          <div class="section-h">
+            <h2 class="section-title">EASTER EGG</h2>
+            <span class="tag">HIDDEN</span>
+          </div>
+
+          <button class="btn" id="btnMiniEgg">IF YOU DOUBT YOURSELF, CLICK HERE</button>
+          <div class="reveal" id="miniEggBox" aria-hidden="true">
+            <!-- EDIT HERE: egg line -->
+            <p class="msg">
+              Reminder: You’ve done hard things before — and you didn’t do them by being fearless.
+              You did them by continuing anyway.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        Made as a simple website so this year, you don’t have to email yourself a birthday message. Hope you like it.
+      </footer>
+
+      <div class="row" style="margin-top:12px; justify-content:center;">
+        <button class="btn" id="btnToEnd">FINISH UPDATE</button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      PAGE 4: EASTER EGG FOUND + QUESTION
+      ========================================================= -->
+    <section class="page card" data-page="eggGate" style="margin-top:16px;">
+      <p class="title">CONGRATS — EASTER EGG FOUND</p>
+      <p class="note" style="margin-top:0;">
+        You noticed the heart. Of course you did.
+      </p>
+
+      <!-- EDIT HERE: Egg question -->
+      <div style="margin-top:14px;">
+        <p class="note" style="margin:0 0 8px;">
+          One more check: When is Daniel’s birthday?
+        </p>
+
+        <!-- Typed input (more “password vibe”) -->
+        <!-- EDIT HERE: placeholder + expected answer in JS below -->
+        <input class="input" id="eggAnswer" placeholder="e.g. 13 Feb" />
+
+        <div class="row" style="margin-top:10px;">
+          <button class="btn btn-secondary" id="btnEggSubmit">UNLOCK</button>
+          <button class="btn" id="btnEggBack">BACK</button>
+        </div>
+
+        <div id="eggToast" class="toast"></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      PAGE 6: END / CREDITS
+      ========================================================= -->
+    <section class="page card" data-page="end" style="margin-top:16px;">
+      <p class="title">UPDATE COMPLETE</p>
+      <p class="note" style="margin-top:0;">
+        v20.0 installed successfully. New quests unlocked.
+      </p>
+
+      <div class="row" style="margin-top:14px;">
+        <button class="btn btn-secondary" id="btnBackToMain">BACK TO PATCH NOTES</button>
+      </div>
+
+      <p class="note" style="margin-top:14px;">
+        (If you found the heart, you’re officially a completionist.)
+      </p>
+    </section>
+
+  </div>
+
+  <!-- =========================================================
+    PAGE 5: VIDEO MODAL POPUP (over Page 3)
+  ========================================================= -->
+  <div class="modal" id="videoModal" aria-hidden="true">
+    <div class="modal-inner">
+      <div class="modal-h">
+        <p class="modal-title">SECRET LOG — v19.0 “Future Daniel…”</p>
+        <button class="modal-close" id="btnCloseVideo">CLOSE</button>
+      </div>
+
+      <!-- EDIT HERE: Put your file name exactly (same folder as HTML) -->
+      <video
+        id="videoFuture"
+        class="video"
+        controls
+        preload="metadata"
+        playsinline
+        muted
+      >
+        <source src="future-daniel.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <!-- EDIT HERE: line under video -->
+      <p class="note" style="margin-top:12px;">
+        To Future Daniel (10 years later): keep building — but don’t forget to live inside the moments too.
+      </p>
+
+      <p class="note" style="opacity:.85;">
+        (If autoplay is blocked on mobile, just tap play — phones are strict about this.)
+      </p>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+      NAVIGATION (6 pages via show/hide)
+      Pages:
+        welcome -> gate -> main -> eggGate -> (videoModal) -> end
+    ========================================================= */
+
+    const pages = Array.from(document.querySelectorAll(".page"));
+
+    function showPage(pageName){
+      pages.forEach(p => p.classList.toggle("active", p.dataset.page === pageName));
+      // Optional: jump to top on “page change”
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* =========================================================
+      PAGE 1 -> PAGE 2
+    ========================================================= */
+    document.getElementById("btnStart").addEventListener("click", () => {
+      showPage("gate");
+    });
+
+    document.getElementById("btnGateBack").addEventListener("click", () => {
+      showPage("welcome");
+    });
+
+    /* =========================================================
+      PAGE 2: Gate quiz logic
+      - click a choice
+      - correct -> go to main page
+    ========================================================= */
+    const gateToast = document.getElementById("gateToast");
+
+    document.querySelectorAll(".gate-choice").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const ok = btn.dataset.correct === "true";
+        if (ok){
+          gateToast.className = "toast good";
+          gateToast.textContent = "Access granted. (Well done, you remembered!)";
+          setTimeout(() => showPage("main"), 500);
+        } else {
+          gateToast.className = "toast bad";
+          gateToast.textContent = "Wrong. Try again. (You’re never beating the “forgetful” allegations.)";
+        }
+      });
+    });
+
+    /* =========================================================
+      PAGE 3: Portrait toggle
+      - EDIT HERE: file names
+    ========================================================= */
+    const btnPortrait = document.getElementById("btnPortrait");
+    const imgPortrait = document.getElementById("imgPortrait");
+    const portraits = ["daniel-nice.jpg", "daniel-funny.jpg"];
+    let portraitIndex = 0;
+
+    btnPortrait.addEventListener("click", () => {
+      portraitIndex = (portraitIndex + 1) % portraits.length;
+      imgPortrait.src = portraits[portraitIndex];
+    });
+
+    /* =========================================================
+      PAGE 3: Unlimited unlockables with ONE reusable handler
+      - Any button with class .toggle-btn will work
+      - It uses:
+          data-target="#id"
+          data-open-text="..."
+          data-close-text="..."
+    ========================================================= */
+    function toggleReveal(btn){
+      const targetSel = btn.getAttribute("data-target");
+      const openText = btn.getAttribute("data-open-text") || "OPEN";
+      const closeText = btn.getAttribute("data-close-text") || "CLOSE";
+
+      const box = document.querySelector(targetSel);
+      if (!box) return;
+
+      const isOpen = box.classList.toggle("open");
+      box.setAttribute("aria-hidden", String(!isOpen));
+      btn.textContent = isOpen ? closeText : openText;
+    }
+
+    // Event delegation: one listener for all unlockable buttons
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".toggle-btn");
+      if (!btn) return;
+      toggleReveal(btn);
+    });
+
+    /* =========================================================
+      Mini egg on Page 3 (button toggles reveal)
+    ========================================================= */
+    const btnMiniEgg = document.getElementById("btnMiniEgg");
+    const miniEggBox = document.getElementById("miniEggBox");
+
+    btnMiniEgg.addEventListener("click", () => {
+      const isOpen = miniEggBox.classList.toggle("open");
+      miniEggBox.setAttribute("aria-hidden", String(!isOpen));
+      btnMiniEgg.textContent = isOpen ? "CLOSE" : "IF YOU DOUBT YOURSELF, CLICK HERE";
+    });
+
+    /* =========================================================
+      PAGE 3 -> PAGE 4 (Easter egg gate)
+      - Clicking the heart brings you to the eggGate page
+    ========================================================= */
+    document.getElementById("btnHeart").addEventListener("click", () => {
+      showPage("eggGate");
+      // clear old state
+      document.getElementById("eggAnswer").value = "";
+      const t = document.getElementById("eggToast");
+      t.textContent = "";
+      t.className = "toast";
+    });
+
+    document.getElementById("btnEggBack").addEventListener("click", () => {
+      showPage("main");
+    });
+
+    /* =========================================================
+      PAGE 4: Easter egg question -> open video modal
+      - EDIT HERE: set accepted answers
+    ========================================================= */
+    const eggToast = document.getElementById("eggToast");
+    const eggAnswer = document.getElementById("eggAnswer");
+
+    function normalize(s){
+      return (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+
+  // EDIT HERE: acceptable answers
+  const acceptedEggAnswers = [
+  "1 march",
+  "1 mar",
+  "march 1",
+  "mar 1",
+  "01/03",
+  "01-03",
+  "1/3",
+  "1-3"
+  ];
+    document.getElementById("btnEggSubmit").addEventListener("click", () => {
+      const val = normalize(eggAnswer.value);
+
+      const ok = acceptedEggAnswers.includes(val);
+      if (!ok){
+        eggToast.className = "toast bad";
+        eggToast.textContent = "Not quite. Hint: try a short format like “13 Feb”.";
+        return;
+      }
+
+      eggToast.className = "toast good";
+      eggToast.textContent = "Unlocked. Loading secret log…";
+
+      // Show main page first, then open modal (feels smoother)
+      setTimeout(() => {
+        showPage("main");
+        openVideoModal();
+      }, 450);
+    });
+
+    /* =========================================================
+      PAGE 5: Video modal (auto-play vibe)
+      Notes:
+        - Mobile browsers often block autoplay unless muted + user gesture.
+        - We set muted + playsinline, then try video.play().
+    ========================================================= */
+    const videoModal = document.getElementById("videoModal");
+    const btnCloseVideo = document.getElementById("btnCloseVideo");
+    const videoFuture = document.getElementById("videoFuture");
+
+    function openVideoModal(){
+      videoModal.classList.add("open");
+      videoModal.setAttribute("aria-hidden", "false");
+
+      // Attempt autoplay (best effort)
+      videoFuture.currentTime = 0;
+      videoFuture.muted = true;
+
+      const playPromise = videoFuture.play();
+      if (playPromise && typeof playPromise.catch === "function"){
+        playPromise.catch(() => {
+          // Autoplay blocked — user can tap play.
+        });
+      }
+    }
+
+    function closeVideoModal(){
+      videoModal.classList.remove("open");
+      videoModal.setAttribute("aria-hidden", "true");
+
+      // Clean stop
+      videoFuture.pause();
+      videoFuture.currentTime = 0;
+    }
+
+    btnCloseVideo.addEventListener("click", closeVideoModal);
+
+    // Close modal if user clicks outside the modal box
+    videoModal.addEventListener("click", (e) => {
+      if (e.target === videoModal) closeVideoModal();
+    });
+
+    // ESC to close (desktop)
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && videoModal.classList.contains("open")){
+        closeVideoModal();
+      }
+    });
+
+    /* =========================================================
+      PAGE 3 -> PAGE 6 (Finish)
+    ========================================================= */
+    document.getElementById("btnToEnd").addEventListener("click", () => {
+      showPage("end");
+    });
+
+    document.getElementById("btnBackToMain").addEventListener("click", () => {
+      showPage("main");
+    });
+    // ======================================
+// RANDOM HEART APPEARANCE
+// Makes heart glow randomly every 6–10s
+// ======================================
+
+const heart = document.querySelector(".pixel-heart");
+
+function randomHeartPulse() {
+  if (!heart) return;
+
+  // show heart
+  heart.style.opacity = "1";
+  heart.style.transform = "translateY(0)";
+
+  // hide after 1.5s
+  setTimeout(() => {
+    heart.style.opacity = "0";
+    heart.style.transform = "translateY(2px)";
+  }, 1500);
+
+  // schedule next pulse randomly
+  const nextTime = Math.random() * 4000 + 6000; // 6–10 seconds
+  setTimeout(randomHeartPulse, nextTime);
+}
+
+// start random pulses
+setTimeout(randomHeartPulse, 5000);
+  </script>
+</body>
+</html>
